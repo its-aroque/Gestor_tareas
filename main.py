@@ -4,6 +4,7 @@ from tkinter import ttk, messagebox
 from tareas import GestorTareas
 import calendar
 from datetime import date
+from pathlib import Path
 
 # Colores del proyecto
 FONDO = "#F7F3EC"
@@ -89,6 +90,31 @@ def mostrar_inicio():
         fg=VERDE_OSCURO,
         font=("Segoe UI", 11)
     ).pack(anchor="w", pady=(10, 0))
+
+    ruta_imagen = Path(__file__).resolve().parent / "assets" / "inicio.png"
+
+    if ruta_imagen.exists():
+        imagen = tk.PhotoImage(file=str(ruta_imagen))
+
+        # Reducir la imagen si es demasiado grande
+        ancho_maximo = 600
+        alto_maximo = 300
+
+        factor = max(
+            1,
+            (imagen.width() + ancho_maximo - 1) // ancho_maximo,
+            (imagen.height() + alto_maximo - 1) // alto_maximo
+        )
+
+        imagen = imagen.subsample(factor, factor)
+
+        etiqueta_imagen = tk.Label(
+            contenido,
+            image=imagen,
+            bg=FONDO
+        )
+        etiqueta_imagen.image = imagen
+        etiqueta_imagen.pack(pady=25)
 
 
 def nueva_tarea():
