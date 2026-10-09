@@ -2,6 +2,8 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from tareas import GestorTareas
+import calendar
+from datetime import date
 
 # Colores del proyecto
 FONDO = "#F7F3EC"
@@ -230,22 +232,117 @@ def completar(id_tarea):
     gestor.completar_tarea(id_tarea)
     mostrar_tareas()
 
-
-def mostrar_proximamente(seccion):
+    
+def mostrar_calendario():
     limpiar_contenido()
-    crear_titulo(
-        seccion,
-        "Esta seccion estara disponible proximamente."
-    )
+    crear_titulo("Calendario", "Organiza tus dias de estudio.")
+
+    hoy = date.today()
+    mostrar_mes(hoy.year, hoy.month)
+
+
+def mostrar_mes(anio, mes):
+    limpiar_contenido()
+    crear_titulo("Calendario", "Consulta tus fechas importantes.")
+
+    encabezado = tk.Frame(contenido, bg=FONDO)
+    encabezado.pack(pady=10)
+
+    def anterior():
+        nuevo_mes = mes - 1
+        nuevo_anio = anio
+
+        if nuevo_mes == 0:
+            nuevo_mes = 12
+            nuevo_anio -= 1
+
+        mostrar_mes(nuevo_anio, nuevo_mes)
+
+    def siguiente():
+        nuevo_mes = mes + 1
+        nuevo_anio = anio
+
+        if nuevo_mes == 13:
+            nuevo_mes = 1
+            nuevo_anio += 1
+
+        mostrar_mes(nuevo_anio, nuevo_mes)
+
+    tk.Button(
+        encabezado, text="<",
+        command=anterior,
+        bg=VERDE, fg=BLANCO,
+        width=4
+    ).pack(side="left", padx=15)
+
+    nombre_mes = [
+        "Enero", "Febrero", "Marzo", "Abril",
+        "Mayo", "Junio", "Julio", "Agosto",
+        "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    ][mes - 1]
+
+    tk.Label(
+        encabezado,
+        text=f"{nombre_mes} {anio}",
+        bg=FONDO,
+        fg=VERDE_OSCURO,
+        font=("Segoe UI", 18, "bold")
+    ).pack(side="left", padx=15)
+
+    tk.Button(
+        encabezado, text=">",
+        command=siguiente,
+        bg=VERDE, fg=BLANCO,
+        width=4
+    ).pack(side="left", padx=15)
+
+    tabla = tk.Frame(contenido, bg=BLANCO, padx=15, pady=15)
+    tabla.pack(pady=20)
+
+    dias = ["Lun", "Mar", "Mie", "Jue", "Vie", "Sab", "Dom"]
+
+    for columna, dia in enumerate(dias):
+        tk.Label(
+            tabla,
+            text=dia,
+            bg=VERDE,
+            fg=BLANCO,
+            width=8,
+            pady=10
+        ).grid(row=0, column=columna, padx=2, pady=2)
+
+    semanas = calendar.monthcalendar(anio, mes)
+
+    for fila, semana in enumerate(semanas, start=1):
+        for columna, dia in enumerate(semana):
+            texto = str(dia) if dia != 0 else ""
+
+            color = BLANCO
+            if (
+                dia == date.today().day
+                and mes == date.today().month
+                and anio == date.today().year
+            ):
+                color = ROSA
+
+            tk.Label(
+                tabla,
+                text=texto,
+                bg=color,
+                fg=VERDE_OSCURO,
+                width=8,
+                height=3,
+                relief="solid",
+                borderwidth=1
+            ).grid(row=fila, column=columna, padx=2, pady=2)
+
 
 
 # Botones de navegacion
 opciones = [
     ("Inicio", mostrar_inicio),
     ("Mis tareas", mostrar_tareas),
-    ("Calendario", lambda: mostrar_proximamente("Calendario")),
-    ("Horario", lambda: mostrar_proximamente("Horario")),
-    ("Cursos", lambda: mostrar_proximamente("Cursos"))
+    ("Calendario", mostrar_calendario)
 ]
 
 for texto, funcion in opciones:
